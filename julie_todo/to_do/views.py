@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions
 
 from .models import Board, TodoItem
@@ -10,7 +11,6 @@ date = timezone.localdate()
 class BoardAPIList(generics.ListCreateAPIView):
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
-    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         user = self.request.user
@@ -21,7 +21,6 @@ class BoardAPIList(generics.ListCreateAPIView):
 class BoardAPIUpdate(generics.UpdateAPIView):
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
-    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         user = self.request.user
@@ -31,8 +30,6 @@ class BoardAPIUpdate(generics.UpdateAPIView):
 class TodoAPIList(generics.ListCreateAPIView):
     queryset = TodoItem.objects.all()
     serializer_class = TodoItemSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-
-    # def get_queryset(self):
-    #     status = self.request.status
-    #     return super().get_queryset().filter(status=status)
+    permission_classes = (permissions.AllowAny,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['status']

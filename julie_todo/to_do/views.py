@@ -1,9 +1,10 @@
+from django.db import transaction
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, response, status
 from rest_framework.decorators import action
+
 from to_do.tasks import change_board_status
-from rest_framework import response, status
 
 from .models import Board, TodoItem
 from .serializers import BoardSerializer, TodoItemSerializer
@@ -20,13 +21,13 @@ class BoardAPIList(generics.ListCreateAPIView):
         date = timezone.localdate()
         return super().get_queryset().filter(user=user, start=date)
 
+    @transaction.atomic
     @action(
         detail=False,
         methods=['post'],
         url_path='change-board-status',
     )
-
-    def change_status(self, request, pk=None):
+    def change_status(self, request):
         change_board_status.apply_async(kwargs={'completed': False})
         return response.Response(status=status.HTTP_20_OK)
 

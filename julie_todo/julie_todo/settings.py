@@ -175,10 +175,10 @@ SIMPLE_JWT = {
 CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
 CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
 
-CELERYBEAT_SCHEDULE = {
+CELERY_BEAT_SCHEDULE = {
     'change_board_status': {
         'task': 'to_do.tasks.change_board_status',
         'schedule': timedelta(seconds=15),
-        'options': {'queue': 'low_priority'}
+        # 'options': {'queue': 'low_priority'}
     }
 }

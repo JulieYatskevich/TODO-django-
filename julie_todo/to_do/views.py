@@ -1,6 +1,9 @@
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions
+from rest_framework.decorators import action
+from to_do.tasks import change_board_status
+from rest_framework import response, status
 
 from .models import Board, TodoItem
 from .serializers import BoardSerializer, TodoItemSerializer
@@ -16,6 +19,16 @@ class BoardAPIList(generics.ListCreateAPIView):
         user = self.request.user
         date = timezone.localdate()
         return super().get_queryset().filter(user=user, start=date)
+
+    @action(
+        detail=False,
+        methods=['post'],
+        url_path='change-board-status',
+    )
+
+    def change_status(self, request, pk=None):
+        change_board_status.apply_async(kwargs={'completed': False})
+        return response.Response(status=status.HTTP_20_OK)
 
 
 class BoardAPIUpdate(generics.UpdateAPIView):
